@@ -1,1 +1,48 @@
-﻿
+using System;
+using System.Collections.Generic;
+
+namespace MO_LAB3
+{
+    public class Programm
+    {
+        public static void Main()
+        {
+            int b = -16, flag = 0;
+            List<double> vec_c = new List<double>() { 6, 9, 5, 8, 5, 8, 6, 8 };
+            vec_c.Sort(); //сортируем вектор c от наименьшего к наибольшему значению
+            List<double> vec_a = new List<double>() { -5, -1, 9, -5, 5, 9, 6, -6 };
+            string aspiration = "min";
+            string sign = "<=";
+            if(sign == "max") //если функция стремится к max, то меняем стремление на min
+            {
+                flag = 1; //чтобы в будущем можно было снова вернуть стремление функции к max
+                for(int i = 0; i < vec_c.Count; ++i)
+                {
+                    if (vec_c[i] == 0) continue;
+                    vec_c[i] = (-1) * vec_c[i];
+                }
+            }
+            List<double> answer = new List<double>(); //отдельное решение
+            List<List<double>> answer_list = new List<List<double>>(); //список со всеми допустимыми решениями
+            double F_min = 100000, F = 0, sum = 0;
+            Console.WriteLine("Метод полного перебора: ");
+            List<List<double>> combinations = new List<List<double>>(); //список, в котором будут находиться все возможные комбинации 0 и 1 для переменных
+            GenerateCombinations(vec_c.Count, new List<double>(), ref combinations); //ищем все возможные комбинации 0 и 1
+        } 
+
+        static void GenerateCombinations(int n, List<double> current, ref List<List<double>> result) //рекурсивный метод, создающий все возможные комбинации 0 и 1 для переменных
+        {
+            if (current.Count == n) //если комбинация готова, то записываем её в список с комбинациями
+            {
+                result.Add(new List<double>(current));
+                return;
+            }
+            current.Add(0); 
+            GenerateCombinations(n, current, ref result);
+            current.RemoveAt(current.Count - 1);
+            current.Add(1);
+            GenerateCombinations(n, current, ref result);
+            current.RemoveAt(current.Count - 1);
+        }
+    }
+}﻿
