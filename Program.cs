@@ -69,8 +69,48 @@ namespace MO_LAB4
                     if (acceptable_solution == false) no_answer_list.Add(new List<double>(answer));
                     answer[i] = 0;
                 }
+                if (no_answer_list.Count == 0) break; //если недопустимых решений нет, то последний рекорд - это ответ на метод Балаша
+                no_answer_list = new List<List<double>>(one_iteration(ref no_answer_list, ref position, vec_c, vec_a, b, ref record, ref answer_list)); //проходим одну итерацию метода Балаша
+                if (no_answer_list.Count == 0) break; 
+                no_answer_list = new List<List<double>>(one_iteration(ref no_answer_list, ref position, vec_c, vec_a, b, ref record, ref answer_list)); 
+                if (no_answer_list.Count == 0) break; 
+                no_answer_list = new List<List<double>>(one_iteration(ref no_answer_list, ref position, vec_c, vec_a, b, ref record, ref answer_list)); 
+                if (no_answer_list.Count == 0) break; 
+                no_answer_list = new List<List<double>>(one_iteration(ref no_answer_list, ref position, vec_c, vec_a, b, ref record, ref answer_list)); 
+                if (no_answer_list.Count == 0) break; 
+                no_answer_list = new List<List<double>>(one_iteration(ref no_answer_list, ref position, vec_c, vec_a, b, ref record, ref answer_list)); 
+                if (no_answer_list.Count == 0) break; 
+                no_answer_list = new List<List<double>>(one_iteration(ref no_answer_list, ref position, vec_c, vec_a, b, ref record, ref answer_list)); 
+                if (no_answer_list.Count == 0) break; 
+                if (answer_list.Count == 0) //если в дереве нет допустимых решений, то проверяем решение Xi = 1
+                {
+                    answer = new List<double>() { 0, 1, 1, 1, 1, 1, 1, 1, 1 };
+                    acceptable_solution = Solution_check(ref answer, vec_c, vec_a, b); //проверяем решение на допустимость
+                    if (acceptable_solution == true) //если решение допустимо, то метод Балаша завершен
+                    {
+                        answer_list.Add(new List<double>(answer));
+                        record = new List<double>(answer);
+                    }
+                 }
                 break;
             }
+            int del = 0;
+            for (int i = 0; i < answer_list.Count; ++i) //удаляем дубликаты найденных решений, если они есть
+            {
+                if (answer_list.Count == 1) break;
+                for (int j = 0; j < answer_list.Count; ++j)
+                {
+                    if (answer_list.Count == 1) break;
+                    if (j == i) continue;
+                    del = 0;
+                    for(int z = 0; z < answer_list[i].Count; ++z) 
+                    {
+                        if (answer_list[i][z] == answer_list[j][z]) ++del;
+                    }
+                    if (del == 9) answer_list.RemoveAt(i);
+                }
+            }
+            print_answers(answer_list, vec_c, vec_a, b); //вызываем метод печати и проверки на допустимость всех ответов, найденных из метода Балаша
         } 
 
         static void GenerateCombinations(int n, List<double> current, ref List<List<double>> result) //рекурсивный метод, создающий все возможные комбинации 0 и 1 для переменных
@@ -132,7 +172,7 @@ namespace MO_LAB4
                 Console.Write($" <= {b} \t{sum} <= {b}");
                 if (sum <= b) Console.Write(" - верно\n");
             }
-            Console.WriteLine($"\nИскомое решение:");
+            Console.WriteLine($"\nОптимальное решение:");
             for (int i = 0; i < answer_list.Count; ++i) //выводим в консоль оптимальное решение
             {
                 if (answer_list[i][0] == F_min) 
@@ -144,6 +184,34 @@ namespace MO_LAB4
                     }
                 }
             }
+        }
+
+        static List<List<double>> one_iteration(ref List<List<double>> no_answer_list, ref List<double> position, List<double> vec_c, List<double> vec_a, int b, ref List<double> record, ref List<List<double>> answer_list) //одна итерация метода Балаша
+        {
+            bool acceptable_solution = false;
+            List<List<double>> no_answer_list2 = new List<List<double>>(); //список с недопустимыми решениями некоторого подмножества
+            for (int i = 0; i < no_answer_list.Count; ++i) //строим ветви для недопустимых решений
+            {
+                for (int j = 1; j < no_answer_list[i].Count; ++j)
+                {
+                    if (position.Contains(j) == true) continue; //по I правилу мы не строим вершины, являющиеся продолжением допустимых решений
+                    if (no_answer_list[i][j] == 1) continue;
+                    no_answer_list[i][j] = 1;
+                    List<double> temp = new List<double>(no_answer_list[i]);
+                    acceptable_solution = Solution_check(ref temp, vec_c, vec_a, b); //проверяем решение на допустимость
+                    no_answer_list[i] = new List<double>(temp);
+                    if (no_answer_list[i][0] > record[0]) break; //если значение некоторой функции > рекорда, то дальше мы решения не рассматриваем(Правило II)
+                    if (acceptable_solution == true) //если решение допустимо, то добавляем его в список решений и отбрасываем все следующие за ним ветви (Правило I)
+                    {
+                        answer_list.Add(new List<double>(no_answer_list[i]));
+                        if (record[0] > no_answer_list[i][0]) record = new List<double>(no_answer_list[i]);
+                        position.Add(j);
+                    }
+                    if (acceptable_solution == false) no_answer_list2.Add(new List<double>(no_answer_list[i]));
+                    no_answer_list[i][j] = 0;
+                }
+            }
+            return new List<List<double>>(no_answer_list2);
         }
     }
 }﻿
