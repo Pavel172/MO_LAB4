@@ -94,22 +94,7 @@ namespace MO_LAB4
                  }
                 break;
             }
-            int del = 0;
-            for (int i = 0; i < answer_list.Count; ++i) //удаляем дубликаты найденных решений, если они есть
-            {
-                if (answer_list.Count == 1) break;
-                for (int j = 0; j < answer_list.Count; ++j)
-                {
-                    if (answer_list.Count == 1) break;
-                    if (j == i) continue;
-                    del = 0;
-                    for(int z = 0; z < answer_list[i].Count; ++z) 
-                    {
-                        if (answer_list[i][z] == answer_list[j][z]) ++del;
-                    }
-                    if (del == 9) answer_list.RemoveAt(i);
-                }
-            }
+            delete_duplicates(ref answer_list); //удаляем дубликаты найденных решений, если они есть
             print_answers(answer_list, vec_c, vec_a, b); //вызываем метод печати и проверки на допустимость всех ответов, найденных из метода Балаша
         } 
 
@@ -186,6 +171,26 @@ namespace MO_LAB4
             }
         }
 
+        static void delete_duplicates(ref List<List<double>> answer_list) //метод нахождения и удаления повторяющихся решений
+        {
+            int del = 0;
+            for (int i = 0; i < answer_list.Count; ++i) 
+            {
+                if (answer_list.Count == 1) break;
+                for (int j = 0; j < answer_list.Count; ++j)
+                {
+                    if (answer_list.Count == 1) break;
+                    if (j == i) continue;
+                    del = 0;
+                    for (int z = 0; z < answer_list[i].Count; ++z)
+                    {
+                        if (answer_list[i][z] == answer_list[j][z]) ++del;
+                    }
+                    if (del == 9) answer_list.RemoveAt(i);
+                }
+            }
+        }
+
         static List<List<double>> one_iteration(ref List<List<double>> no_answer_list, ref List<double> position, List<double> vec_c, List<double> vec_a, int b, ref List<double> record, ref List<List<double>> answer_list) //одна итерация метода Балаша
         {
             bool acceptable_solution = false;
@@ -211,6 +216,7 @@ namespace MO_LAB4
                     no_answer_list[i][j] = 0;
                 }
             }
+            delete_duplicates(ref no_answer_list2); //удаляем дубликаты найденных решений, если они есть
             return new List<List<double>>(no_answer_list2);
         }
     }
